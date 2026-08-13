@@ -1,0 +1,13 @@
+{
+  "name": "poc-mp3-preprocessors",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "chunk-and-transcribe": "node src/cli/ChunkAndTranscribeRecordingsController.js",
+    "validate": "node --check src/cli/ChunkAndTranscribeRecordingsController.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

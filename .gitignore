@@ -1,0 +1,8 @@
+.env
+node_modules/
+.DS_Store
+outputs/
+outputs/chunks/
+outputs/transcripts/
+outputs/manifests/
+inputs/

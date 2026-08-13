@@ -1,0 +1,31 @@
+export function createMaritimeRecordingModel({
+  sourceFilePath,
+  inputRootDirectoryPath,
+  relativeDirectoryPath,
+  fileNameWithoutExtension,
+  dateStamp,
+  scheduledStartTime,
+  scheduledEndTime,
+  channel,
+  scheduledStartSecondsAfterMidnight,
+  scheduledEndSecondsAfterMidnight,
+  durationSeconds,
+  sampleRate,
+  channelCount,
+}) {
+  return Object.freeze({
+    sourceFilePath,
+    inputRootDirectoryPath,
+    relativeDirectoryPath,
+    fileNameWithoutExtension,
+    dateStamp,
+    scheduledStartTime,
+    scheduledEndTime,
+    channel,
+    scheduledStartSecondsAfterMidnight,
+    scheduledEndSecondsAfterMidnight,
+    durationSeconds,
+    sampleRate,
+    channelCount,
+  });
+}

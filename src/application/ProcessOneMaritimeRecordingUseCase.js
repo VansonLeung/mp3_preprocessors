@@ -5,11 +5,11 @@ import { readAudioMetadataWithFfprobeAdapter } from "../infrastructure/ffmpeg/Ff
 import { detectSilenceEventsWithFfmpegAdapter } from "../infrastructure/ffmpeg/FfmpegSilenceDetectionAdapter.js";
 import { exportMp3ChunkWithFfmpegAdapter } from "../infrastructure/ffmpeg/FfmpegMp3ChunkExportAdapter.js";
 import { concatenateMp3ChunksWithFfmpegAdapter } from "../infrastructure/ffmpeg/FfmpegMergedMp3ChunkConcatAdapter.js";
-import { transcribeMp3ChunkWithMlxWhisperAdapter } from "../infrastructure/whisper/MlxWhisperTranscriptionAdapter.js";
 import { ensureOutputDirectoryExistsAdapter } from "../infrastructure/filesystem/OutputDirectoryCreationAdapter.js";
 import { stitchSourceRecordingTranscriptsAdapter } from "../infrastructure/filesystem/TranscriptStitchingAdapter.js";
 import { createSilenceBasedChunkPlanUseCase } from "./CreateSilenceBasedChunkPlanUseCase.js";
 import { createMergedChunkPlanUseCase } from "./CreateMergedChunkPlanUseCase.js";
+import { runSelectedTranscriptionStrategyUseCase } from "./transcriptionStrategies/RunSelectedTranscriptionStrategyUseCase.js";
 
 function createManifestRecordForChunk({
   chunk,
@@ -30,11 +30,28 @@ function createManifestRecordForChunk({
     chunkEndSeconds: chunk.chunkEndSeconds,
     chunkDurationSeconds: chunk.chunkDurationSeconds,
     outputFilePath: chunk.outputFilePath,
+    transcriptionStrategy: transcriptionResult?.strategyName ?? null,
+    asrProvider: transcriptionResult?.asrProvider ?? null,
+    language: transcriptionResult?.language ?? null,
     transcriptTextFilePath: transcriptionResult?.textFilePath ?? null,
     transcriptRelativeSrtFilePath:
       transcriptionResult?.relativeSrtFilePath ?? null,
     transcriptAbsoluteSrtFilePath:
       transcriptionResult?.absoluteSrtFilePath ?? null,
+    analysisJsonFilePath: transcriptionResult?.analysisJsonFilePath ?? null,
+    analysisMarkdownFilePath:
+      transcriptionResult?.analysisMarkdownFilePath ?? null,
+    childTranscriptionResultCount:
+      transcriptionResult?.childTranscriptionResults?.length ?? 0,
+    childTranscriptionResults:
+      transcriptionResult?.childTranscriptionResults?.map(
+        (childTranscriptionResult) => ({
+          language: childTranscriptionResult.language,
+          textFilePath: childTranscriptionResult.textFilePath,
+          relativeSrtFilePath: childTranscriptionResult.relativeSrtFilePath,
+          absoluteSrtFilePath: childTranscriptionResult.absoluteSrtFilePath,
+        }),
+      ) ?? [],
   };
 }
 
@@ -118,23 +135,6 @@ export async function processOneMaritimeRecordingUseCase({
     "chunk-merged",
     relativeDirectoryPath,
   );
-  const chunkTranscriptOutputDirectoryPath = path.join(
-    configuration.outputsDirectoryPath,
-    "transcripts",
-    "chunks",
-    "relative",
-    relativeDirectoryPath,
-    parsedFileName.fileNameWithoutExtension,
-  );
-  const chunkAbsoluteSrtOutputDirectoryPath = path.join(
-    configuration.outputsDirectoryPath,
-    "transcripts",
-    "chunks",
-    "absolute",
-    relativeDirectoryPath,
-    parsedFileName.fileNameWithoutExtension,
-  );
-
   const chunks = createSilenceBasedChunkPlanUseCase({
     sourceRecording,
     silenceEvents,
@@ -192,13 +192,9 @@ export async function processOneMaritimeRecordingUseCase({
       callbacks?.onChunkExported?.({ chunk });
 
       if (configuration.enableTranscription) {
-        transcriptionResult = await transcribeMp3ChunkWithMlxWhisperAdapter({
-          whisperCommand: configuration.whisperCommand,
-          whisperModel: configuration.whisperModel,
-          whisperLanguage: configuration.whisperLanguage,
+        transcriptionResult = await runSelectedTranscriptionStrategyUseCase({
           chunk,
-          transcriptOutputDirectoryPath: chunkTranscriptOutputDirectoryPath,
-          absoluteSrtOutputDirectoryPath: chunkAbsoluteSrtOutputDirectoryPath,
+          configuration,
           callbacks,
         });
 
@@ -225,6 +221,7 @@ export async function processOneMaritimeRecordingUseCase({
     sourceRecordingTranscriptResult =
       await stitchSourceRecordingTranscriptsAdapter({
         outputsDirectoryPath: configuration.outputsDirectoryPath,
+        strategyName: configuration.transcriptionStrategy,
         sourceRecording,
         transcriptionResults: chunkTranscriptionResults,
       });

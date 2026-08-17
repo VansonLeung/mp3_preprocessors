@@ -25,8 +25,9 @@ cp .env.example .env
 Important defaults:
 
 ```env
-ENABLE_CHUNK_MERGING=true
-ENABLE_TRANSCRIPTION=false
+ENABLE_CHUNK_MERGING=false
+ENABLE_TRANSCRIPTION=true
+TRANSCRIPTION_STRATEGY=blank-asr
 MERGED_CHUNK_MAXIMUM_DURATION_MINUTES=
 ```
 
@@ -135,6 +136,8 @@ Enable transcription in `.env`:
 
 ```env
 ENABLE_TRANSCRIPTION=true
+TRANSCRIPTION_STRATEGY=blank-asr
+ASR_PROVIDER=mlx-whisper
 WHISPER_COMMAND=mlx_whisper
 WHISPER_MODEL=mlx-community/whisper-large-v3-turbo
 WHISPER_LANGUAGE=auto
@@ -144,6 +147,14 @@ Run:
 
 ```bash
 npm run chunk-and-transcribe -- --enable-transcription
+```
+
+Choose a transcription strategy:
+
+```bash
+npm run chunk-and-transcribe -- --enable-transcription --strategy blank-asr
+npm run chunk-and-transcribe -- --enable-transcription --strategy blank-asr-maritime-analysis
+npm run chunk-and-transcribe -- --enable-transcription --strategy multilingual-asr-maritime-analysis
 ```
 
 Transcribe from existing cached chunks only:
@@ -164,18 +175,71 @@ Transcribe one cached chunk:
 npm run chunk-and-transcribe -- --transcribe-existing-chunks --input outputs/chunks/20240921_0000_0400/20240921_0000_0200_BPT67/20240921_0000_0200_BPT67__000000_000__000007_208.mp3
 ```
 
+Transcribe cached chunks with a strategy:
+
+```bash
+npm run chunk-and-transcribe -- --transcribe-existing-chunks --strategy blank-asr
+npm run chunk-and-transcribe -- --transcribe-existing-chunks --strategy blank-asr-maritime-analysis
+npm run chunk-and-transcribe -- --transcribe-existing-chunks --strategy multilingual-asr-maritime-analysis
+```
+
 Chunk transcript outputs:
 
 ```text
-outputs/transcripts/chunks/relative/
-outputs/transcripts/chunks/absolute/
+outputs/transcripts/chunks/<strategy>/<language>/relative/
+outputs/transcripts/chunks/<strategy>/<language>/absolute/
+```
+
+LLM analysis outputs:
+
+```text
+outputs/analysis/chunks/<strategy>/<language>/
 ```
 
 Stitched transcript outputs:
 
 ```text
-outputs/transcripts/source-recordings/
-outputs/transcripts/date-channel/
+outputs/transcripts/source-recordings/<strategy>/
+outputs/transcripts/date-channel/<strategy>/
+```
+
+## ASR / LLM Providers
+
+Local `mlx_whisper` ASR:
+
+```env
+ASR_PROVIDER=mlx-whisper
+WHISPER_COMMAND=mlx_whisper
+WHISPER_MODEL=mlx-community/whisper-large-v3-turbo
+```
+
+OpenAI-compatible ASR endpoint:
+
+```env
+ASR_PROVIDER=openai-compatible
+ASR_BASE_URL=http://localhost:8000/v1
+ASR_API_KEY=
+ASR_TRANSCRIPTIONS_PATH=/audio/transcriptions
+ASR_MODEL=Qwen3-ASR-1.7B-bf16
+ASR_RESPONSE_FORMAT=verbose_json
+ASR_ENABLE_STREAMING=false
+```
+
+OpenAI-compatible LLM endpoint:
+
+```env
+ENABLE_LLM_LAYER=true
+LLM_BASE_URL=http://localhost:8001/v1
+LLM_API_KEY=
+LLM_CHAT_COMPLETIONS_PATH=/chat/completions
+LLM_MODEL=Qwen3.5-35B-A3B-4bit
+LLM_MAX_TOKENS=128
+LLM_ENABLE_STREAMING=true
+```
+
+`ASR_ENABLE_STREAMING=true` and `LLM_ENABLE_STREAMING=true` expect SSE-style streaming responses. Use `--verbose` to print stream events/deltas.
+
+Note: streaming ASR usually returns text deltas only. Non-streaming ASR with `verbose_json` can produce relative and absolute SRTs when the provider returns timestamped segments.
 ```
 
 ## Useful Small Test

@@ -105,11 +105,43 @@ export function createEnvironmentConfigurationModel({
       environmentVariables.ENABLE_TRANSCRIPTION,
       false,
     ),
+    transcriptionStrategy:
+      environmentVariables.TRANSCRIPTION_STRATEGY ?? "blank-asr",
     whisperCommand: environmentVariables.WHISPER_COMMAND ?? "mlx_whisper",
     whisperModel:
       environmentVariables.WHISPER_MODEL ??
       "mlx-community/whisper-large-v3-turbo",
     whisperLanguage: environmentVariables.WHISPER_LANGUAGE ?? "auto",
+    asrProvider: environmentVariables.ASR_PROVIDER ?? "mlx-whisper",
+    asrBaseUrl: environmentVariables.ASR_BASE_URL ?? "",
+    asrApiKey: environmentVariables.ASR_API_KEY ?? "",
+    asrTranscriptionsPath:
+      environmentVariables.ASR_TRANSCRIPTIONS_PATH ?? "/audio/transcriptions",
+    asrModel: environmentVariables.ASR_MODEL ?? "",
+    asrResponseFormat:
+      environmentVariables.ASR_RESPONSE_FORMAT ?? "verbose_json",
+    asrEnableStreaming: parseBooleanEnvironmentValue(
+      environmentVariables.ASR_ENABLE_STREAMING,
+      false,
+    ),
+    llmBaseUrl: environmentVariables.LLM_BASE_URL ?? "",
+    llmApiKey: environmentVariables.LLM_API_KEY ?? "",
+    llmChatCompletionsPath:
+      environmentVariables.LLM_CHAT_COMPLETIONS_PATH ?? "/chat/completions",
+    llmModel: environmentVariables.LLM_MODEL ?? "",
+    llmMaxTokens: parseNumberEnvironmentValue(
+      environmentVariables.LLM_MAX_TOKENS,
+      512,
+      "LLM_MAX_TOKENS",
+    ),
+    llmEnableStreaming: parseBooleanEnvironmentValue(
+      environmentVariables.LLM_ENABLE_STREAMING,
+      true,
+    ),
+    enableLlmLayer: parseBooleanEnvironmentValue(
+      environmentVariables.ENABLE_LLM_LAYER,
+      false,
+    ),
   };
 
   if (configuration.minimumChunkDurationSeconds <= 0) {
@@ -138,6 +170,10 @@ export function createEnvironmentConfigurationModel({
     throw new Error(
       "MERGED_CHUNK_INSERT_SILENCE_SECONDS must be greater than or equal to 0.",
     );
+  }
+
+  if (configuration.llmMaxTokens <= 0) {
+    throw new Error("LLM_MAX_TOKENS must be greater than 0.");
   }
 
   return Object.freeze(configuration);

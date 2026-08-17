@@ -5,7 +5,7 @@ import { parseChunkedMaritimeRecordingFileName } from "../domain/ParseChunkedMar
 import { readAudioMetadataWithFfprobeAdapter } from "../infrastructure/ffmpeg/FfprobeAudioMetadataAdapter.js";
 import { discoverMaritimeRecordingInputFilesAdapter } from "../infrastructure/filesystem/MaritimeRecordingInputFileDiscoveryAdapter.js";
 import { writeProcessingManifestFileAdapter } from "../infrastructure/filesystem/ProcessingManifestWriterAdapter.js";
-import { transcribeMp3ChunkWithMlxWhisperAdapter } from "../infrastructure/whisper/MlxWhisperTranscriptionAdapter.js";
+import { runSelectedTranscriptionStrategyUseCase } from "./transcriptionStrategies/RunSelectedTranscriptionStrategyUseCase.js";
 
 function createManifestRecordForCachedChunkTranscription({ transcriptionResult }) {
   const { chunk } = transcriptionResult;
@@ -19,9 +19,25 @@ function createManifestRecordForCachedChunkTranscription({ transcriptionResult }
     chunkStartSeconds: chunk.chunkStartSeconds,
     chunkEndSeconds: chunk.chunkEndSeconds,
     chunkDurationSeconds: chunk.chunkDurationSeconds,
+    transcriptionStrategy: transcriptionResult.strategyName,
+    asrProvider: transcriptionResult.asrProvider,
+    language: transcriptionResult.language,
     transcriptTextFilePath: transcriptionResult.textFilePath,
     transcriptRelativeSrtFilePath: transcriptionResult.relativeSrtFilePath,
     transcriptAbsoluteSrtFilePath: transcriptionResult.absoluteSrtFilePath,
+    analysisJsonFilePath: transcriptionResult.analysisJsonFilePath,
+    analysisMarkdownFilePath: transcriptionResult.analysisMarkdownFilePath,
+    transcriptionTiming: transcriptionResult.transcriptionTiming,
+    childTranscriptionResultCount:
+      transcriptionResult.childTranscriptionResults.length,
+    childTranscriptionResults: transcriptionResult.childTranscriptionResults.map(
+      (childTranscriptionResult) => ({
+        language: childTranscriptionResult.language,
+        textFilePath: childTranscriptionResult.textFilePath,
+        relativeSrtFilePath: childTranscriptionResult.relativeSrtFilePath,
+        absoluteSrtFilePath: childTranscriptionResult.absoluteSrtFilePath,
+      }),
+    ),
   };
 }
 
@@ -105,25 +121,9 @@ export async function transcribeExistingChunksUseCase({
 
       callbacks?.onCachedChunkTranscriptionStarted?.({ chunk });
 
-      const transcriptionResult = await transcribeMp3ChunkWithMlxWhisperAdapter({
-        whisperCommand: configuration.whisperCommand,
-        whisperModel: configuration.whisperModel,
-        whisperLanguage: configuration.whisperLanguage,
+      const transcriptionResult = await runSelectedTranscriptionStrategyUseCase({
         chunk,
-        transcriptOutputDirectoryPath: path.join(
-          configuration.outputsDirectoryPath,
-          "transcripts",
-          "chunks",
-          "relative",
-          relativeDirectoryPath,
-        ),
-        absoluteSrtOutputDirectoryPath: path.join(
-          configuration.outputsDirectoryPath,
-          "transcripts",
-          "chunks",
-          "absolute",
-          relativeDirectoryPath,
-        ),
+        configuration,
         callbacks,
       });
 

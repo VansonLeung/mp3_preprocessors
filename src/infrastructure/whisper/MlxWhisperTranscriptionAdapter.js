@@ -27,6 +27,7 @@ export async function transcribeMp3ChunkWithMlxWhisperAdapter({
   whisperCommand,
   whisperModel,
   whisperLanguage,
+  strategyName = "blank-asr",
   chunk,
   transcriptOutputDirectoryPath,
   absoluteSrtOutputDirectoryPath,
@@ -76,6 +77,9 @@ export async function transcribeMp3ChunkWithMlxWhisperAdapter({
 
   return createTranscriptionResultModel({
     chunk,
+    strategyName,
+    asrProvider: "mlx-whisper",
+    language: whisperLanguage,
     textFilePath: await findGeneratedTranscriptionFilePath({
       whisperOutputDirectoryPath: transcriptOutputDirectoryPath,
       chunkOutputFileName: chunk.outputFileName,

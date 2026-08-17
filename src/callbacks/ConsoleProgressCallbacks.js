@@ -42,7 +42,7 @@ export function createConsoleProgressCallbacks({ verbose }) {
 
     onTranscriptionCompleted({ chunk, transcriptionResult }) {
       console.log(
-        `Transcribed ${chunk.outputFileName}: ${transcriptionResult.whisperOutputDirectoryPath}`,
+        `Transcribed ${chunk.outputFileName}: strategy=${transcriptionResult.strategyName}, language=${transcriptionResult.language}`,
       );
     },
 
@@ -73,6 +73,24 @@ export function createConsoleProgressCallbacks({ verbose }) {
       console.log(
         `Stitched date/channel transcript for ${dateStamp} ${channel}: ${stitchedDateChannelTranscriptResult.textFilePath}`,
       );
+    },
+
+    onServerSentEventReceived({ eventName, data }) {
+      if (verbose) {
+        console.error(`SSE ${eventName}: ${data.slice(0, 240)}`);
+      }
+    },
+
+    onAsrStreamTextDelta({ language, textDelta }) {
+      if (verbose) {
+        process.stderr.write(`[ASR ${language}] ${textDelta}`);
+      }
+    },
+
+    onLlmStreamTextDelta({ contentDelta }) {
+      if (verbose) {
+        process.stderr.write(contentDelta);
+      }
     },
 
     onRecordingCompleted({ sourceRecording, chunkCount, mergedChunkCount }) {

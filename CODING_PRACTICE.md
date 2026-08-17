@@ -92,6 +92,16 @@ Domain functions should not call ffmpeg, read files, write files, call APIs, or 
 
 Good domain functions are easy to test with only input objects and return values.
 
+Domain-specific prompt hints should live in dedicated domain files, not inline inside provider adapters.
+
+Example:
+
+```text
+src/domain/BuildMaritimeTranscriptAnalysisPromptBiasRules.js
+```
+
+These hints should be treated as soft analysis bias. They are useful for recurring maritime ASR mishearings, but prompts should still ask the LLM to preserve uncertainty.
+
 ## Adapters
 
 Adapters talk to the outside world.
@@ -220,6 +230,10 @@ src/infrastructure/asr/OpenAiCompatibleAsrAdapter.js
 src/infrastructure/asr/MlxWhisperAsrAdapter.js
 src/infrastructure/llm/OpenAiCompatibleLlmAdapter.js
 ```
+
+Streaming and SSE parsing should stay in HTTP/provider adapters, not in strategy files.
+
+Strategy files should ask adapters for complete results and may receive progress through callbacks.
 
 ## Naming
 

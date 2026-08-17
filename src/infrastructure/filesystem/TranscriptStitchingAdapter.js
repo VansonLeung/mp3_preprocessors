@@ -116,6 +116,7 @@ async function writeStitchedTranscriptGroup({
 
 export async function stitchSourceRecordingTranscriptsAdapter({
   outputsDirectoryPath,
+  strategyName,
   sourceRecording,
   transcriptionResults,
 }) {
@@ -123,6 +124,7 @@ export async function stitchSourceRecordingTranscriptsAdapter({
     outputsDirectoryPath,
     "transcripts",
     "source-recordings",
+    strategyName,
     sourceRecording.relativeDirectoryPath,
   );
   const baseFileName = sourceRecording.fileNameWithoutExtension;
@@ -143,6 +145,7 @@ export async function stitchSourceRecordingTranscriptsAdapter({
 
 export async function stitchDateChannelTranscriptsAdapter({
   outputsDirectoryPath,
+  strategyName,
   dateStamp,
   channel,
   transcriptionResults,
@@ -151,6 +154,7 @@ export async function stitchDateChannelTranscriptsAdapter({
     outputsDirectoryPath,
     "transcripts",
     "date-channel",
+    strategyName,
     dateStamp,
     channel,
   );

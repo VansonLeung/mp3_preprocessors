@@ -67,6 +67,7 @@ export async function processAllMaritimeRecordingsUseCase({
       const stitchedDateChannelTranscriptResult =
         await stitchDateChannelTranscriptsAdapter({
           outputsDirectoryPath: configuration.outputsDirectoryPath,
+          strategyName: configuration.transcriptionStrategy,
           dateStamp: dateChannelTranscriptionGroup.dateStamp,
           channel: dateChannelTranscriptionGroup.channel,
           transcriptionResults:

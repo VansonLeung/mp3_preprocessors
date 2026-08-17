@@ -11,6 +11,7 @@ function printUsageAndExit() {
 
 Options:
   --input <path>             Select one MP3 file or one directory. Can be repeated.
+  --strategy <name>          Override TRANSCRIPTION_STRATEGY for this run.
   --transcribe-existing-chunks
                              Transcribe MP3s already present in outputs/chunks.
   --dry-run                  Detect silence and write a manifest without exporting chunks.
@@ -29,6 +30,7 @@ function parseControllerArguments(argv) {
     limit: null,
     selectedInputPaths: [],
     transcribeExistingChunks: false,
+    transcriptionStrategyOverride: null,
     enableTranscriptionOverride: null,
     verbose: false,
   };
@@ -44,6 +46,14 @@ function parseControllerArguments(argv) {
       parsedArguments.verbose = true;
     } else if (argument === "--transcribe-existing-chunks") {
       parsedArguments.transcribeExistingChunks = true;
+    } else if (argument === "--strategy") {
+      const transcriptionStrategy = argv[index + 1];
+      if (!transcriptionStrategy) {
+        throw new Error("--strategy requires a strategy name.");
+      }
+
+      parsedArguments.transcriptionStrategyOverride = transcriptionStrategy;
+      index += 1;
     } else if (argument === "--enable-transcription") {
       parsedArguments.enableTranscriptionOverride = true;
     } else if (argument === "--disable-transcription") {
@@ -83,14 +93,21 @@ async function runChunkAndTranscribeRecordingsController() {
   const loadedConfiguration = loadEnvironmentConfiguration({
     workspaceDirectoryPath,
   });
-  const configuration =
-    controllerArguments.enableTranscriptionOverride === null
-      ? loadedConfiguration
-      : Object.freeze({
-          ...loadedConfiguration,
+  const configuration = Object.freeze({
+    ...loadedConfiguration,
+    ...(controllerArguments.enableTranscriptionOverride === null
+      ? {}
+      : {
           enableTranscription:
             controllerArguments.enableTranscriptionOverride,
-        });
+        }),
+    ...(controllerArguments.transcriptionStrategyOverride === null
+      ? {}
+      : {
+          transcriptionStrategy:
+            controllerArguments.transcriptionStrategyOverride,
+        }),
+  });
 
   const callbacks = createConsoleProgressCallbacks({
     verbose: controllerArguments.verbose,

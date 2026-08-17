@@ -111,6 +111,7 @@ export async function processOneMaritimeRecordingUseCase({
     configuration.outputsDirectoryPath,
     "chunks",
     relativeDirectoryPath,
+    parsedFileName.fileNameWithoutExtension,
   );
   const outputMergedChunksDirectoryPath = path.join(
     configuration.outputsDirectoryPath,
@@ -123,6 +124,7 @@ export async function processOneMaritimeRecordingUseCase({
     "chunks",
     "relative",
     relativeDirectoryPath,
+    parsedFileName.fileNameWithoutExtension,
   );
   const chunkAbsoluteSrtOutputDirectoryPath = path.join(
     configuration.outputsDirectoryPath,
@@ -130,6 +132,7 @@ export async function processOneMaritimeRecordingUseCase({
     "chunks",
     "absolute",
     relativeDirectoryPath,
+    parsedFileName.fileNameWithoutExtension,
   );
 
   const chunks = createSilenceBasedChunkPlanUseCase({

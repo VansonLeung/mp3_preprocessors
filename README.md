@@ -55,7 +55,13 @@ npm run chunk-and-transcribe -- --disable-transcription
 Chunk MP3s are written to:
 
 ```text
-outputs/chunks/
+outputs/chunks/<input-folder>/<source-mp3-name>/
+```
+
+Example:
+
+```text
+outputs/chunks/20240921_0000_0400/20240921_0000_0200_ELN14/20240921_0000_0200_ELN14__012537_079__012541_079.mp3
 ```
 
 ## Select Input MP3s
@@ -138,6 +144,24 @@ Run:
 
 ```bash
 npm run chunk-and-transcribe -- --enable-transcription
+```
+
+Transcribe from existing cached chunks only:
+
+```bash
+npm run chunk-and-transcribe -- --transcribe-existing-chunks
+```
+
+Transcribe cached chunks from one cached chunk folder:
+
+```bash
+npm run chunk-and-transcribe -- --transcribe-existing-chunks --input outputs/chunks/20240921_0000_0400
+```
+
+Transcribe one cached chunk:
+
+```bash
+npm run chunk-and-transcribe -- --transcribe-existing-chunks --input outputs/chunks/20240921_0000_0400/20240921_0000_0200_BPT67/20240921_0000_0200_BPT67__000000_000__000007_208.mp3
 ```
 
 Chunk transcript outputs:

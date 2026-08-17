@@ -3,6 +3,7 @@
 import { loadEnvironmentConfiguration } from "../config/LoadEnvironmentConfiguration.js";
 import { createConsoleProgressCallbacks } from "../callbacks/ConsoleProgressCallbacks.js";
 import { processAllMaritimeRecordingsUseCase } from "../application/ProcessAllMaritimeRecordingsUseCase.js";
+import { transcribeExistingChunksUseCase } from "../application/TranscribeExistingChunksUseCase.js";
 
 function printUsageAndExit() {
   console.log(`Usage:
@@ -10,6 +11,8 @@ function printUsageAndExit() {
 
 Options:
   --input <path>             Select one MP3 file or one directory. Can be repeated.
+  --transcribe-existing-chunks
+                             Transcribe MP3s already present in outputs/chunks.
   --dry-run                  Detect silence and write a manifest without exporting chunks.
   --limit <number>           Process only the first N discovered MP3 files.
   --enable-transcription     Override ENABLE_TRANSCRIPTION=true for this run.
@@ -25,6 +28,7 @@ function parseControllerArguments(argv) {
     dryRun: false,
     limit: null,
     selectedInputPaths: [],
+    transcribeExistingChunks: false,
     enableTranscriptionOverride: null,
     verbose: false,
   };
@@ -38,6 +42,8 @@ function parseControllerArguments(argv) {
       parsedArguments.dryRun = true;
     } else if (argument === "--verbose") {
       parsedArguments.verbose = true;
+    } else if (argument === "--transcribe-existing-chunks") {
+      parsedArguments.transcribeExistingChunks = true;
     } else if (argument === "--enable-transcription") {
       parsedArguments.enableTranscriptionOverride = true;
     } else if (argument === "--disable-transcription") {
@@ -89,6 +95,16 @@ async function runChunkAndTranscribeRecordingsController() {
   const callbacks = createConsoleProgressCallbacks({
     verbose: controllerArguments.verbose,
   });
+
+  if (controllerArguments.transcribeExistingChunks) {
+    await transcribeExistingChunksUseCase({
+      configuration,
+      limit: controllerArguments.limit,
+      selectedInputPaths: controllerArguments.selectedInputPaths,
+      callbacks,
+    });
+    return;
+  }
 
   await processAllMaritimeRecordingsUseCase({
     configuration,

@@ -46,6 +46,10 @@ export function createConsoleProgressCallbacks({ verbose }) {
       );
     },
 
+    onCachedChunkTranscriptionStarted({ chunk }) {
+      console.log(`Transcribing cached chunk: ${chunk.outputFileName}`);
+    },
+
     onMergedChunkExported({ mergedChunk }) {
       console.log(
         `Exported merged listening file ${mergedChunk.mergedChunkIndex + 1}: ${mergedChunk.outputFileName}`,

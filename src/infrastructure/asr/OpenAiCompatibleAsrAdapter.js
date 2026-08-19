@@ -58,6 +58,9 @@ export async function transcribeAudioWithOpenAiCompatibleAsrAdapter({
   asrTranscriptionsPath,
   asrModel,
   asrResponseFormat,
+  asrPrompt,
+  asrHotwords,
+  asrVocabulary,
   audioFilePath,
   language,
   enableStreaming,
@@ -73,6 +76,18 @@ export async function transcribeAudioWithOpenAiCompatibleAsrAdapter({
     path.basename(audioFilePath),
   );
   requestBody.append("response_format", asrResponseFormat);
+
+  if (asrPrompt) {
+    requestBody.append("prompt", asrPrompt);
+  }
+
+  if (asrHotwords) {
+    requestBody.append("hotwords", asrHotwords);
+  }
+
+  if (asrVocabulary) {
+    requestBody.append("vocabulary", asrVocabulary);
+  }
 
   if (language && language !== "auto") {
     requestBody.append("language", language);

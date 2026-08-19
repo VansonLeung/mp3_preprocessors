@@ -1,5 +1,7 @@
 .env
 node_modules/
+dist/
+resource_navigator/dist/
 .DS_Store
 outputs/
 outputs/chunks/

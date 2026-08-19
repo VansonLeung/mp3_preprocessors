@@ -43,6 +43,12 @@ function formatAnalysisMarkdown({ analysis }) {
 ${debugContext.rawTranscriptText ?? ""}
 \`\`\`
 
+## Conversation Structure
+
+\`\`\`json
+${JSON.stringify(analysis.conversationStructure ?? {}, null, 2)}
+\`\`\`
+
 ## Analysis Description
 
 ${analysis.analysisDescription ?? ""}

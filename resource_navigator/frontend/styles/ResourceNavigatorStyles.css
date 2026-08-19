@@ -1,0 +1,271 @@
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: #f5f7fb;
+}
+
+.app-shell {
+  width: 100%;
+  height: 100%;
+}
+
+.app-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #d8dee8;
+}
+
+.app-title {
+  margin: 0 !important;
+  white-space: nowrap;
+}
+
+.app-subtitle {
+  color: #5b6678;
+}
+
+.app-content {
+  height: calc(100vh - 56px);
+  display: grid;
+  grid-template-columns: minmax(280px, 22vw) minmax(420px, 1fr) minmax(420px, 34vw);
+  gap: 10px;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.left-column,
+.middle-column,
+.right-column {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.panel-card,
+.preview-card,
+.preview-tabs {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panel-card {
+  flex: 1;
+}
+
+.panel-card .ant-card-body,
+.preview-card .ant-card-body {
+  height: calc(100% - 40px);
+  overflow: auto;
+}
+
+.full-width-control {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.resource-tree {
+  min-width: 0;
+}
+
+.source-recording-list {
+  margin-top: 8px;
+  height: calc(100% - 42px);
+  overflow: auto;
+}
+
+.source-recording-analysis-badge {
+  margin-right: 8px;
+}
+
+.navigation-tabs-card .ant-card-body {
+  height: 100%;
+  padding: 0 10px 10px;
+}
+
+.navigation-tabs,
+.navigation-tabs .ant-tabs-content,
+.navigation-tabs .ant-tabs-tabpane {
+  height: 100%;
+  min-height: 0;
+}
+
+.embedded-panel-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.selected-list-item,
+.selected-table-row > td {
+  background: #eaf3ff !important;
+}
+
+.timeline-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.timeline-search {
+  width: 210px;
+}
+
+.timeline-transcript-collapsed,
+.timeline-transcript-expanded {
+  margin-bottom: 0 !important;
+}
+
+.timeline-transcript-expanded {
+  white-space: normal;
+}
+
+.analysis-job-alert {
+  margin-bottom: 8px;
+}
+
+.analysis-job-log {
+  margin: 8px 0 0;
+  padding: 8px;
+  max-height: 120px;
+  overflow: auto;
+  background: #f7f9fc;
+  border: 1px solid #d8dee8;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.preview-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 6px;
+  padding: 0 10px 10px;
+}
+
+.preview-tabs .ant-tabs-content-holder {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.preview-tabs .ant-tabs-content,
+.preview-tabs .ant-tabs-tabpane {
+  height: 100%;
+  min-height: 0;
+}
+
+.preview-tabs .ant-tabs-tabpane {
+  overflow: auto;
+}
+
+.preview-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-card .ant-card-body {
+  flex: 1;
+  min-height: 0;
+}
+
+.resource-path {
+  display: block;
+  margin-bottom: 10px;
+  max-width: 100%;
+}
+
+.audio-player {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.audio-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.active-transcript-sentence {
+  margin-top: 12px;
+  padding: 10px;
+  background: #f7f9fc;
+  border: 1px solid #d8dee8;
+  border-radius: 6px;
+  line-height: 1.55;
+}
+
+.text-preview {
+  margin: 0;
+  padding: 12px;
+  min-height: 100%;
+  background: #f7f9fc;
+  border: 1px solid #d8dee8;
+  border-radius: 6px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.analysis-summary-panel {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #d8dee8;
+}
+
+.analysis-description {
+  line-height: 1.55;
+}
+
+.analysis-reason-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.analysis-raw-json-collapse {
+  margin-top: 12px;
+}
+
+.analysis-raw-json {
+  margin: 0;
+  padding: 12px;
+  max-height: 420px;
+  overflow: auto;
+  background: #f7f9fc;
+  border: 1px solid #d8dee8;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+@media (max-width: 1180px) {
+  .app-content {
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: minmax(360px, 1fr) minmax(340px, 45vh);
+  }
+
+  .right-column {
+    grid-column: 1 / -1;
+  }
+}

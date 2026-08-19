@@ -68,6 +68,18 @@ Prompt bias rules may influence classification, but they must not create extract
 Do not extract words like maaf, ma de, 马德, MARDEP, Marine Department, or 海事 as callsigns or vessel names unless the transcript clearly uses them as an identifier. Put suspected agencies in agencyNames. Put weak corrections in uncertainties.
 For Chinese ASR, preserve the raw entity text. Example: if the transcript says 城墙三二, extract 城墙三二; do not rewrite it as 马德 32 or an invented romanization.
 
+Conversation structure rules:
+- Analyze whether the transcript is likely a single-speaker broadcast, hailing/call test, or multi-speaker exchange.
+- This is text-inferred speaker attribution, not acoustic speaker diarization.
+- Do not invent turn timestamps. Use the transcript text only.
+- Acknowledgements like 收到, 好的...收到, vessel-name...收到 may indicate a responding speaker.
+- Repeated patterns like 海事警告... vessel...收到 may indicate a marine department broadcast followed by vessel acknowledgement.
+- Split acknowledgements such as 好的，工华收到 or 广信幺八八收到 into separate speakerTurnHypotheses.
+- If text looks like X海事警告警告警告, infer speakerLabel 海事 and addressedTo X when plausible; X is usually the vessel being warned, not the speaker.
+- Prefer real inferred entity names as speakerLabel, such as 海事, 工华, 广信幺八八. Use generic labels only when no entity is inferable.
+- Do not merge a warning broadcast and a vessel acknowledgement into one speaker turn.
+- If unsure, keep speaker labels generic and lower confidence.
+
 Chunk context:
 ${JSON.stringify(buildPromptChunkContext(debugContext), null, 2)}
 
@@ -123,6 +135,30 @@ Return this JSON shape:
       ...
     ],
     "requests": [
+      "...",
+      ...
+    ]
+  },
+  "conversationStructure": {
+    "isLikelyMultiSpeakerConversation": true,
+    "speakerCountEstimate": 2,
+    "speakerCountConfidence": 0,
+    "speakerAttributionMethod": "text_inferred_not_audio_diarization",
+    "conversationPattern": "single_speaker_broadcast | hailing_acknowledgement | warning_acknowledgement | multi_vessel_exchange | unknown",
+    "speakerTurnHypotheses": [
+      {
+        "speakerLabel": "...",
+        "speakerRole": "marine_department | vessel | station | unknown",
+        "addressedTo": "...",
+        "text": "...",
+        "evidence": [
+          "...",
+          ...
+        ],
+        "confidence": 0
+      }
+    ],
+    "uncertainties": [
       "...",
       ...
     ]
@@ -226,6 +262,17 @@ export async function analyzeMaritimeTranscriptWithLlmUseCase({
       vesselInformation: {},
       commandInformation: {},
       spokenLanguageProportions: null,
+      conversationStructure: {
+        isLikelyMultiSpeakerConversation: false,
+        speakerCountEstimate: 0,
+        speakerCountConfidence: 0,
+        speakerAttributionMethod: "text_inferred_not_audio_diarization",
+        conversationPattern: "unknown",
+        speakerTurnHypotheses: [],
+        uncertainties: [
+          "Conversation structure is unavailable because the LLM response could not be parsed.",
+        ],
+      },
       confidence: 0,
       analysisDescription:
         "The LLM response could not be parsed as JSON. Inspect analysisRemarks.parseFailure.rawLlmResponseText for debugging.",
@@ -261,6 +308,7 @@ export async function analyzeMaritimeTranscriptWithLlmUseCase({
       parsedAnalysis.recommendedHumanReviewLabel ?? "",
     vesselInformation: parsedAnalysis.vesselInformation ?? {},
     commandInformation: parsedAnalysis.commandInformation ?? {},
+    conversationStructure: parsedAnalysis.conversationStructure ?? null,
     spokenLanguageProportions:
       parsedAnalysis.spokenLanguageProportions ?? null,
     confidence: parsedAnalysis.confidence ?? 0,

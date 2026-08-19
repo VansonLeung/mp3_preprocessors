@@ -1,0 +1,33 @@
+{
+  "name": "resource-navigator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:server\"",
+    "dev:frontend": "vite --host 127.0.0.1 --port 5173",
+    "dev:server": "tsx watch server/ResourceNavigatorServerController.ts",
+    "build": "tsc --noEmit && vite build",
+    "start": "NODE_ENV=production tsx server/ResourceNavigatorServerController.ts"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.5.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "antd": "^5.22.5",
+    "concurrently": "^9.1.0",
+    "express": "^4.21.2",
+    "mime-types": "^2.1.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/mime-types": "^2.1.4",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
+  }
+}

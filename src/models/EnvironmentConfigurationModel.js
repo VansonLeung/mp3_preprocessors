@@ -1,4 +1,5 @@
 import path from "node:path";
+import { buildDefaultMaritimeAsrPromptText } from "../domain/BuildDefaultMaritimeAsrPromptText.js";
 
 function parseBooleanEnvironmentValue(rawValue, defaultValue) {
   if (rawValue === undefined || rawValue === "") {
@@ -124,6 +125,12 @@ export function createEnvironmentConfigurationModel({
       environmentVariables.ASR_ENABLE_STREAMING,
       false,
     ),
+    asrPrompt:
+      environmentVariables.ASR_PROMPT === undefined
+        ? buildDefaultMaritimeAsrPromptText()
+        : environmentVariables.ASR_PROMPT,
+    asrHotwords: environmentVariables.ASR_HOTWORDS ?? "",
+    asrVocabulary: environmentVariables.ASR_VOCABULARY ?? "",
     llmBaseUrl: environmentVariables.LLM_BASE_URL ?? "",
     llmApiKey: environmentVariables.LLM_API_KEY ?? "",
     llmChatCompletionsPath:

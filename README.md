@@ -47,6 +47,8 @@ Dry-run first:
 npm run chunk-and-transcribe -- --dry-run --limit 1
 ```
 
+---
+
 Create chunks:
 
 ```bash
@@ -73,17 +75,23 @@ Select all inputs:
 npm run chunk-and-transcribe -- --disable-transcription
 ```
 
+---
+
 Select one folder:
 
 ```bash
 npm run chunk-and-transcribe -- --input inputs/20250721_0800_1200 --disable-transcription
 ```
 
+---
+
 Select one MP3:
 
 ```bash
 npm run chunk-and-transcribe -- --input inputs/20250721_0800_1200/20250721_0800_1000_BPT67.mp3 --disable-transcription
 ```
+
+---
 
 Select multiple folders/files:
 
@@ -95,6 +103,76 @@ npm run chunk-and-transcribe -- \
 ```
 
 Use `--limit 1` only for a quick test.
+
+## Select DateTime And Channels
+
+Transcribe existing chunks from one datetime and one channel:
+
+```bash
+LLM_MAX_TOKENS=2048 npm run chunk-and-transcribe -- \
+  --transcribe-existing-chunks \
+  --input outputs/chunks/20240921_0800_1200/20240921_0800_1000_BPT67 \
+  --strategy blank-asr-maritime-analysis
+```
+
+---
+
+Transcribe only the first 10 selected chunks:
+
+```bash
+LLM_MAX_TOKENS=2048 npm run chunk-and-transcribe -- \
+  --transcribe-existing-chunks \
+  --input outputs/chunks/20240921_0800_1200/20240921_0800_1000_BPT67 \
+  --limit 10 \
+  --strategy blank-asr-maritime-analysis
+```
+
+---
+
+Transcribe one exact cached chunk:
+
+```bash
+LLM_MAX_TOKENS=2048 npm run chunk-and-transcribe -- \
+  --transcribe-existing-chunks \
+  --input outputs/chunks/20240921_0800_1200/20240921_0800_1000_BPT67/20240921_0800_1000_BPT67__080621_485__080642_831.mp3 \
+  --strategy blank-asr-maritime-analysis
+```
+
+---
+
+Transcribe multiple channels in the same datetime folder:
+
+```bash
+for channel in BPT67 ELN14 KCCS74 MTP12 SKC63 VPK02 BPT67 ELN14 KCCS74 MTP12 SKC63 VPK02; do
+  for folder in outputs/chunks/20240921_0800_1200/*_${channel}; do
+    LLM_MAX_TOKENS=2048 npm run chunk-and-transcribe -- \
+      --transcribe-existing-chunks \
+      --input "$folder" \
+      --strategy blank-asr-maritime-analysis
+  done
+done
+```
+
+---
+
+Chunk one original MP3 for a selected datetime and channel:
+
+```bash
+npm run chunk-and-transcribe -- \
+  --input inputs/20240921_0800_1200/20240921_0800_1000_BPT67.mp3 \
+  --disable-transcription
+```
+
+---
+
+Chunk and transcribe one original MP3 for a selected datetime and channel:
+
+```bash
+LLM_MAX_TOKENS=2048 npm run chunk-and-transcribe -- \
+  --input inputs/20240921_0800_1200/20240921_0800_1000_BPT67.mp3 \
+  --enable-transcription \
+  --strategy blank-asr-maritime-analysis
+```
 
 ## 3. Merge Chunks For Listening
 
@@ -163,17 +241,23 @@ Transcribe from existing cached chunks only:
 npm run chunk-and-transcribe -- --transcribe-existing-chunks
 ```
 
+---
+
 Transcribe cached chunks from one cached chunk folder:
 
 ```bash
 npm run chunk-and-transcribe -- --transcribe-existing-chunks --input outputs/chunks/20240921_0000_0400
 ```
 
+---
+
 Transcribe one cached chunk:
 
 ```bash
 npm run chunk-and-transcribe -- --transcribe-existing-chunks --input outputs/chunks/20240921_0000_0400/20240921_0000_0200_BPT67/20240921_0000_0200_BPT67__000000_000__000007_208.mp3
 ```
+
+---
 
 Transcribe cached chunks with a strategy:
 
@@ -233,14 +317,13 @@ LLM_BASE_URL=http://localhost:8001/v1
 LLM_API_KEY=
 LLM_CHAT_COMPLETIONS_PATH=/chat/completions
 LLM_MODEL=Qwen3.5-35B-A3B-4bit
-LLM_MAX_TOKENS=128
+LLM_MAX_TOKENS=2048
 LLM_ENABLE_STREAMING=true
 ```
 
 `ASR_ENABLE_STREAMING=true` and `LLM_ENABLE_STREAMING=true` expect SSE-style streaming responses. Use `--verbose` to print stream events/deltas.
 
 Note: streaming ASR usually returns text deltas only. Non-streaming ASR with `verbose_json` can produce relative and absolute SRTs when the provider returns timestamped segments.
-```
 
 ## Useful Small Test
 
@@ -249,6 +332,8 @@ Process only one source MP3:
 ```bash
 npm run chunk-and-transcribe -- --limit 1 --disable-transcription
 ```
+
+---
 
 Process one source MP3 with transcription:
 
